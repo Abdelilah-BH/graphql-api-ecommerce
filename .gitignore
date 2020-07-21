@@ -1,5 +1,9 @@
 # macOS Files
 .DS_Store
 
-node_modules/
+/node_modules
+.env.local
 .env
+.env.development.local
+.env.test.local
+.env.production.local
