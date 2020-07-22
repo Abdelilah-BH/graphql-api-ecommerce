@@ -1,7 +1,6 @@
 const { sign } = require("jsonwebtoken");
 
-const generate_tokens = (user) => {
-    console.log({user});
+const generate_tokens = user => {
     const new_refresh_token = sign({
         _id: user._id,
         civility: user.civility,

@@ -1,7 +1,8 @@
 const { UserInputError } = require("apollo-server-express");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 const { User } = require("../models/users");
-const { schema_create_user, schema_signup, schema_signin } = require("../validations/user");
+const { schema_user, schema_signup, schema_signin } = require("../validations/user");
 const { generate_tokens } = require("../helpers/functions");
 
 const deleteCookie = {
@@ -56,8 +57,9 @@ const resolvers = {
             };
         },
 
+        // not completed
         create_user: async (_, payload) => {
-            const { error } = schema_create_user.validate(payload.input, { abortErly: false });
+            const { error } = schema_user.validate(payload.input, { abortErly: false });
             if(error) 
                 throw new UserInputError("Faild to create user due to validate error", {
                     validationErrors: error.details
@@ -67,12 +69,27 @@ const resolvers = {
             return new_user;
         },
 
+        // not completed
+        update_user: async (_, payload) => {
+            const { error } = schema_user.validate(payload.input, { abortEarly: false });
+            if(error) 
+                throw new UserInputError("Faild to create user due to validate error", {
+                    validationErrors: error.details
+                });
+            await User.updateOne({_id: mongoose.Types.ObjectId(payload.users_id) }, payload.input);
+            return {
+                ok: true,
+                message: "user has been updated"
+            };
+        },
+
+        // not completed
         delete_user: async (_, { users_id }) => {
-            const res = await User.deleteMany({ _id: { $in: users_id }}, (err) => {
-                if(err) throw new UserInputError(err);
-            });
-            if(res.deletedCount === 0) throw new UserInputError("No user has been deleted");
-            return users_id.length();
+            await User.deleteMany({ _id: { $in: users_id }});
+            return {
+                ok: true,
+                message: "users has been deleted"
+            };
         }
     }
 };

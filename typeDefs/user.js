@@ -20,10 +20,10 @@ const type_defs = gql`
         name: String!
         email: String!
         role: Roles
-        password: String!
-        confirmation_password: String!
+        password: String
+        confirmation_password: String
         phone: String
-        civility: Civility
+        civility: Civility!
         date_of_birth: String
     }
 
@@ -50,6 +50,7 @@ const type_defs = gql`
         signin(input: SinginInput!): Result
         signout: Result
         create_user(input: UserInput!): User
+        update_user(users_id: ID!, input: UserInput ): Result
         delete_user(users_id: [ID]!): User
     }
 
