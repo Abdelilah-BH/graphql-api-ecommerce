@@ -48,6 +48,7 @@ const type_defs = gql`
     type Mutation {
         signup(input: SignupInput!): User
         signin(input: SinginInput!): Result
+        signout: Result
         create_user(input: UserInput!): User
         delete_user(users_id: [ID]!): User
     }

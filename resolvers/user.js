@@ -4,11 +4,17 @@ const { User } = require("../models/users");
 const { schema_create_user, schema_signup, schema_signin } = require("../validations/user");
 const { generate_tokens } = require("../helpers/functions");
 
+const deleteCookie = {
+    expires: new Date("1970-01-01"),
+    httpOnly: true
+};
+
 const resolvers = {
     Query: {
         users: async () => await User.find({})
     },
     Mutation: {
+        // not completed
         signup: async (_, payload) => {
             const { error } = schema_signup.validate(payload.input, { abortEarly: false });
             if(error)
@@ -20,6 +26,7 @@ const resolvers = {
             return user;
         },
 
+        // not completed
         signin: async (_, payload, { res }) => {
             const { error } = schema_signin.validate(payload.input, { abortEarly: false });
             if(error)
@@ -39,10 +46,15 @@ const resolvers = {
             };
         },
 
-        // signout: async () => {
-        //     // todo signout.
-        //     console.log("signout");
-        // },
+        // not completed
+        signout: async (_, payload, { res }) => {
+            res.cookie("at", "deleted", deleteCookie);
+            res.cookie("rt", "deleted", deleteCookie);
+            return {
+                ok: true,
+                message: "signout with success"
+            };
+        },
 
         create_user: async (_, payload) => {
             const { error } = schema_create_user.validate(payload.input, { abortErly: false });

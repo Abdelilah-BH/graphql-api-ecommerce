@@ -19,8 +19,8 @@ const app = express();
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-    const refresh_token = req.cookies["rt"];
-    const access_token = req.cookies["at"];
+    const refresh_token = req.signedCookies["rt"];
+    const access_token = req.signedCookies["at"];
     if(!access_token && !refresh_token) return next();
     try {
         const user = jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET);
