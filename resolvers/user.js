@@ -1,6 +1,5 @@
 const { UserInputError } = require("apollo-server-express");
 const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
 const { User } = require("../models/users");
 const { schema_user, schema_signup, schema_signin } = require("../validations/user");
 const { generate_tokens } = require("../helpers/functions");
@@ -12,7 +11,11 @@ const deleteCookie = {
 
 const resolvers = {
     Query: {
-        users: async () => await User.find({})
+        users: async () => await User.find({}),
+        user: async (_, { user_id }) => {
+            const user = await User.findOne({ _id: user_id });
+            return user;
+        }
     },
     Mutation: {
         // not completed
@@ -76,7 +79,7 @@ const resolvers = {
                 throw new UserInputError("Faild to create user due to validate error", {
                     validationErrors: error.details
                 });
-            await User.updateOne({_id: mongoose.Types.ObjectId(payload.users_id) }, payload.input);
+            await User.updateOne({_id: payload.users_id }, payload.input);
             return {
                 ok: true,
                 message: "user has been updated"

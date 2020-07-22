@@ -14,6 +14,7 @@ const type_defs = gql`
 
     type Query {
         users: [User!]
+        user(user_id: ID!): User!
     }
     
     input UserInput {
