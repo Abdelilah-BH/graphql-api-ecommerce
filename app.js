@@ -19,18 +19,15 @@ const app = express();
 app.use(cookieParser());
 
 app.use((req, res, next) => {
-    console.log("tw");
     const refresh_token = req.cookies["rt"];
     const access_token = req.cookies["at"];
     if(!access_token && !refresh_token) return next();
     try {
-        console.log("at");
         const user = jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET);
         req.userId = user._id;
         return next();
     } catch(err) {
         try {
-            console.log("rt");
             const user = jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET);
             req.userId = user._id;
             const { rt, at } = generate_tokens(user);

@@ -81,12 +81,20 @@ const resolvers = {
         },
 
         // not completed
-        update_user: async (_, payload) => {
+        update_user: async (_, payload, { req }) => {
             const { error } = schema_user.validate(payload.input, { abortEarly: false });
             if(error) 
                 throw new UserInputError("Faild to create user due to validate error", {
                     validationErrors: error.details
                 });
+            if(req.userId) {
+                payload.input.history = [];
+                payload.input.history.push({
+                    type_of_action: "UPDATE",
+                    user: req.userId,
+                    date: Date.now()
+                });
+            }
             await User.updateOne({_id: payload.users_id }, payload.input);
             return {
                 ok: true,
@@ -95,8 +103,19 @@ const resolvers = {
         },
 
         // not completed
-        delete_user: async (_, { users_id }) => {
-            await User.deleteMany({ _id: { $in: users_id }});
+        delete_user: async (_, { users_id }, { req }) => {
+            await User.updateMany({
+                _id: { $in: users_id }
+            },{
+                is_deleted: true,
+                history: {
+                    $push: {
+                        type_of_action: "DELETE",
+                        user: req.userId,
+                        date: Date.now()
+                    }
+                }
+            });
             return {
                 ok: true,
                 message: "users has been deleted"

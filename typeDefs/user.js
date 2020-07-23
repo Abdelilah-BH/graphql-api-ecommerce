@@ -64,6 +64,7 @@ const type_defs = gql`
         phone: String
         civility: Civility
         date_of_birth: String
+        is_deleted: Boolean
         history: [History]
     }
 
