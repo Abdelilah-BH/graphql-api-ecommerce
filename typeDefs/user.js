@@ -64,6 +64,22 @@ const type_defs = gql`
         phone: String
         civility: Civility
         date_of_birth: String
+        history: [History]
+    }
+
+    scalar Date
+
+    type History {
+        _id: ID!
+        type_of_action: Actions
+        user: ID!
+        date: Date
+    }
+
+    enum Actions {
+        ADD
+        UPDATE
+        DELETE
     }
 `;
 

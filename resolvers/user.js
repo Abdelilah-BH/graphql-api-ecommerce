@@ -61,12 +61,20 @@ const resolvers = {
         },
 
         // not completed
-        create_user: async (_, payload) => {
+        create_user: async (_, payload, { req }) => {
             const { error } = schema_user.validate(payload.input, { abortErly: false });
             if(error) 
                 throw new UserInputError("Faild to create user due to validate error", {
                     validationErrors: error.details
                 });
+            if(req.userId) {
+                payload.input.history = [];
+                payload.input.history.push({
+                    type_of_action: "ADD",
+                    user: req.userId,
+                    date: Date.now()
+                });
+            }
             const new_user = new User(payload.input);
             await new_user.save();
             return new_user;

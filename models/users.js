@@ -11,14 +11,19 @@ const schema = new mongoose.Schema({
     civility: { type: String, enum: ["Mr", "Mrs"] },
     date_of_birth: Date,
     addresses: [{
-        address: {type: String, require: true},
-        country: {type: String, require: true},
-        city: {type: String, require: true},
-        region: {type: String, require: true},
+        address: { type: String, require: true },
+        country: { type: String, require: true },
+        city: { type: String, require: true },
+        region: { type: String, require: true },
         phone: String,
         zip: { type: Number },
         additional_information: { type: String, min: 3, max: 55 }
-    }]
+    }],
+    history: [{
+        type_of_action: { type: String, enum: ["ADD", "UPDATE", "DELETE"] },
+        user: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
+        date: { type: Date }
+    }],
 }, { timestamps: { createdAt: "createdAt" } });
 
 schema.plugin(uniqueValidator);
