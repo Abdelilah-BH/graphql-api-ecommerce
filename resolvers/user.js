@@ -27,6 +27,9 @@ const resolvers = {
                 });
             const user = new User(payload.input);
             await user.save();
+            const { at, rt } = generate_tokens(user);
+            user.at = at;
+            user.rt = rt;
             return user;
         },
 

@@ -66,6 +66,8 @@ const type_defs = gql`
         date_of_birth: String
         is_deleted: Boolean
         history: [History]
+        at: String
+        rt: String
     }
 
     scalar Date

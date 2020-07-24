@@ -2,9 +2,7 @@ const { sign } = require("jsonwebtoken");
 
 const generate_tokens = user => {
     const new_refresh_token = sign({
-        _id: user._id,
-        civility: user.civility,
-        name: user.name
+        _id: user._id
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "1min" });
