@@ -1,6 +1,7 @@
 const { gql } = require("apollo-server-express");
 
 const type_defs = gql`
+
     enum Civility {
         Mr
         Mrs

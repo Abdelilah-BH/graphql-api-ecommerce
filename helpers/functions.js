@@ -4,8 +4,8 @@ const generate_tokens = user => {
     const new_refresh_token = sign({
         _id: user._id
     },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "1min" });
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "30day" });
     const new_access_token = sign({
         _id: user._id,
         civility: user.civility,

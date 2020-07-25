@@ -1,4 +1,4 @@
-const { UserInputError } = require("apollo-server-express");
+const { UserInputError, AuthenticationError } = require("apollo-server-express");
 const bcrypt = require("bcrypt");
 const { User } = require("../models/users");
 const { schema_user, schema_signup, schema_signin } = require("../validations/user");
@@ -64,17 +64,16 @@ const resolvers = {
         },
 
         // not completed
-        create_user: async (_, payload, { req }) => {
+        create_user: async (_, payload, { isAuth, user }) => {
+            if(!isAuth) throw new AuthenticationError("you are not authenticated");
             const { error } = schema_user.validate(payload.input, { abortErly: false });
             if(error) 
-                throw new UserInputError("Faild to create user due to validate error", {
-                    validationErrors: error.details
-                });
-            if(req.userId) {
+                throw new UserInputError("Faild to create user due to validate error");
+            if(user._id) {
                 payload.input.history = [];
                 payload.input.history.push({
                     type_of_action: "ADD",
-                    user: req.userId,
+                    user: user._id,
                     date: Date.now()
                 });
             }
@@ -84,17 +83,18 @@ const resolvers = {
         },
 
         // not completed
-        update_user: async (_, payload, { req }) => {
+        update_user: async (_, payload, { isAuth, user, req }) => {
+            if(!isAuth) throw new AuthenticationError("you are not authenticated");
             const { error } = schema_user.validate(payload.input, { abortEarly: false });
             if(error) 
                 throw new UserInputError("Faild to create user due to validate error", {
                     validationErrors: error.details
                 });
-            if(req.userId) {
+            if(user._id) {
                 payload.input.history = [];
                 payload.input.history.push({
                     type_of_action: "UPDATE",
-                    user: req.userId,
+                    user: req.user._id,
                     date: Date.now()
                 });
             }
@@ -106,15 +106,16 @@ const resolvers = {
         },
 
         // not completed
-        delete_user: async (_, { users_id }, { req }) => {
+        delete_user: async (_, payload, { isAuth, user }) => {
+            if(!isAuth) throw new AuthenticationError("you are not authenticated");
             await User.updateMany({
-                _id: { $in: users_id }
+                _id: { $in: payload.users_id }
             },{
                 is_deleted: true,
                 history: {
                     $push: {
                         type_of_action: "DELETE",
-                        user: req.userId,
+                        user: user._id,
                         date: Date.now()
                     }
                 }
