@@ -19,12 +19,9 @@ const Auth = ({req, res}) => {
             isAuth = true;
             return { req, res, isAuth, user };
         } catch(err) {
-            console.log(err);
             return { req, res, isAuth };
         }
     }
 };
 
-module.exports = {
-    Auth
-};
+module.exports = { Auth };

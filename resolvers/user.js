@@ -21,10 +21,7 @@ const resolvers = {
         // not completed
         signup: async (_, payload) => {
             const { error } = schema_signup.validate(payload.input, { abortEarly: false });
-            if(error)
-                throw new UserInputError("Faild to signup", {
-                    validationErrors: error.details
-                });
+            if(error) throw new UserInputError("Faild to signup");
             const user = new User(payload.input);
             await user.save();
             const { at, rt } = generate_tokens(user);
