@@ -1,7 +1,4 @@
-const {
-    SchemaDirectiveVisitor,
-    AuthenticationError,
-} = require("apollo-server-express");
+const { SchemaDirectiveVisitor, AuthenticationError } = require("apollo-server-express");
 const jwt = require("jsonwebtoken");
 const { defaultFieldResolver } = require("graphql");
 const { generate_tokens } = require("../helpers/functions");
@@ -31,17 +28,14 @@ class AuthDirective extends SchemaDirectiveVisitor {
             const access_token = req.cookies["at"];
             if (!access_token && !refresh_token)
                 throw new AuthenticationError("you are not authenticated");
-            const user = checkToken(access_token, refresh_token);
-            const { rt, at } = generate_tokens(user);
+            const consumer = checkToken(access_token, refresh_token);
+            const { rt, at } = generate_tokens(consumer);
             res.cookie("rt", rt, { expire: 60 * 5, httpOnly: true });
             res.cookie("at", at, {
                 expire: 60 * 60 * 24 * 30,
                 httpOnly: true,
             });
-            if(!req.user) {
-                req.user = {};
-            }
-            req.user = user;
+            Object.assign(args[1], {consumer_id: consumer._id});
             return resolve.apply(this, args);
         };
     }

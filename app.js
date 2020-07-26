@@ -3,7 +3,7 @@ const { ApolloServer } = require("apollo-server-express");
 require("dotenv").config();
 const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
-const { resolvers } = require("./resolvers/user");
+const resolvers = require("./resolvers/user");
 const { type_defs } = require("./typeDefs/user");
 const AuthDirective = require("./directives/auth");
 

@@ -61,38 +61,35 @@ const resolvers = {
         },
 
         // not completed
-        create_user: async (_, payload, { req }) => {
-            const { error } = schema_user.validate(payload.input, { abortErly: false });
+        create_user: async (_, { input, consumer_id }) => {
+            const { error } = schema_user.validate(input, { abortErly: false });
             if(error) 
                 throw new UserInputError("Faild to create user due to validate error");
-            console.log({user: req.user});
-            if(req.user) {
-                payload.input.history = [];
-                payload.input.history.push({
-                    type_of_action: "ADD",
-                    user: req.user._id,
-                    date: Date.now()
-                });    
-            }
-            const new_user = new User(payload.input);
+            input.history = [];
+            input.history.push({
+                type_of_action: "ADD",
+                user: consumer_id,
+                date: Date.now()
+            });    
+            const new_user = new User(input);
             await new_user.save();
             return new_user;
         },
 
         // not completed
-        update_user: async (_, payload, { req }) => {
-            const { error } = schema_user.validate(payload.input, { abortEarly: false });
+        update_user: async (_, { input, consumer_id }) => {
+            const { error } = schema_user.validate(input, { abortEarly: false });
             if(error) 
                 throw new UserInputError("Faild to create user due to validate error", {
                     validationErrors: error.details
                 });
-            payload.input.history = [];
-            payload.input.history.push({
+            input.history = [];
+            input.history.push({
                 type_of_action: "UPDATE",
-                user: req.user._id,
+                user: consumer_id,
                 date: Date.now()
             });
-            await User.updateOne({_id: payload.users_id }, payload.input);
+            await User.updateOne({_id: consumer_id }, input);
             return {
                 ok: true,
                 message: "user has been updated"
@@ -100,15 +97,15 @@ const resolvers = {
         },
 
         // not completed
-        delete_user: async (_, payload, { req }) => {
+        delete_user: async (_, { users_id, consumer_id }) => {
             await User.updateMany({
-                _id: { $in: payload.users_id }
+                _id: { $in: users_id }
             },{
                 is_deleted: true,
                 history: {
                     $push: {
                         type_of_action: "DELETE",
-                        user: req.user._id,
+                        user: consumer_id,
                         date: Date.now()
                     }
                 }
@@ -121,6 +118,4 @@ const resolvers = {
     }
 };
 
-module.exports = {
-    resolvers
-};
+module.exports = resolvers;
