@@ -1,4 +1,4 @@
-const { UserInputError, AuthenticationError } = require("apollo-server-express");
+const { UserInputError } = require("apollo-server-express");
 const bcrypt = require("bcrypt");
 const { User } = require("../models/users");
 const { schema_user, schema_signup, schema_signin } = require("../validations/user");
