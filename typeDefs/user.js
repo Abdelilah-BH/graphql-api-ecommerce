@@ -1,6 +1,7 @@
 const { gql } = require("apollo-server-express");
 
 const type_defs = gql`
+    directive @auth on FIELD_DEFINITION
 
     enum Civility {
         Mr
@@ -14,7 +15,7 @@ const type_defs = gql`
     }
 
     type Query {
-        users: [User!]
+        users: [User!] @auth
         user(user_id: ID!): User!
     }
     
@@ -51,9 +52,9 @@ const type_defs = gql`
         signup(input: SignupInput!): User
         signin(input: SinginInput!): Result
         signout: Result
-        create_user(input: UserInput!): User
-        update_user(users_id: ID!, input: UserInput ): Result
-        delete_user(users_id: [ID]!): User
+        create_user(input: UserInput!): User @auth
+        update_user(users_id: ID!, input: UserInput ): Result  @auth
+        delete_user(users_id: [ID]!): User  @auth
     }
 
     type User {
