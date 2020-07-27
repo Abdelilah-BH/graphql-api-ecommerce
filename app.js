@@ -6,11 +6,12 @@ const mongoose = require("mongoose");
 const resolvers = require("./resolvers/user");
 const { type_defs } = require("./typeDefs/user");
 const AuthDirective = require("./directives/auth");
+const RoleDirective = require("./directives/role");
 
 const server = new ApolloServer({
     typeDefs: type_defs,
     resolvers,
-    schemaDirectives: { auth: AuthDirective },
+    schemaDirectives: { auth: AuthDirective, role: RoleDirective },
     context: ({req, res}) => ({ req, res })
 });
 

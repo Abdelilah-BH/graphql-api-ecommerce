@@ -5,6 +5,7 @@ const schema_user = Joi.object({
     email: Joi.string().email().required(),
     phone: Joi.string(),
     civility: Joi.string().valid("Mr", "Mrs").required(),
+    is_active: Joi.boolean().default(true),
     date_of_birth: Joi.date(),
     role: Joi.string().valid("ROOT", "ADMIN", "USER"),
     password: Joi.string().min(8),

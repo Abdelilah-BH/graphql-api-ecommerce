@@ -2,6 +2,7 @@ const { gql } = require("apollo-server-express");
 
 const type_defs = gql`
     directive @auth on FIELD_DEFINITION
+    directive @role(requires: Roles = USER) on OBJECT | FIELD_DEFINITION
 
     enum Civility {
         Mr
@@ -26,6 +27,7 @@ const type_defs = gql`
         password: String
         confirmation_password: String
         phone: String
+        is_active: Boolean
         civility: Civility!
         date_of_birth: String
     }
@@ -57,7 +59,7 @@ const type_defs = gql`
         delete_user(users_id: [ID]!): User  @auth
     }
 
-    type User {
+    type User @role(requires: ROOT) {
         _id: ID!
         name: String!
         email: String!
