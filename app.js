@@ -5,13 +5,12 @@ const cookieParser = require("cookie-parser");
 const mongoose = require("mongoose");
 const resolvers = require("./resolvers/user");
 const { type_defs } = require("./typeDefs/user");
-const AuthDirective = require("./directives/auth");
-const RoleDirective = require("./directives/role");
+const PermissionDirective = require("./directives/permission");
 
 const server = new ApolloServer({
     typeDefs: type_defs,
     resolvers,
-    schemaDirectives: { auth: AuthDirective, role: RoleDirective },
+    schemaDirectives: { permission: PermissionDirective },
     context: ({req, res}) => ({ req, res })
 });
 
