@@ -30,9 +30,7 @@ const schema = new mongoose.Schema({
 schema.plugin(uniqueValidator);
 
 schema.pre("save", function(next) {
-    if(!this.isModified("password")){
-        return next;
-    }
+    if(!this.isModified("password")) next();
     this.password = bcrypt.hashSync(this.password, 10);
     next();
 });

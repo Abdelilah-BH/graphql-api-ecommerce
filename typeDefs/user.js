@@ -1,7 +1,7 @@
 const { gql } = require("apollo-server-express");
 
 const type_defs = gql`
-    directive @permission(requires: [Roles] = [ROOT ADMIN USER]) on FIELD_DEFINITION |  OBJECT
+    directive @permissions(requires: [Roles]) on FIELD_DEFINITION
 
     enum Civility {
         Mr
@@ -15,7 +15,7 @@ const type_defs = gql`
     }
 
     type Query {
-        users: [User!]
+        users: [User!] @permissions(requires: [ADMIN])
         user(user_id: ID!): User!
     }
     
@@ -53,12 +53,12 @@ const type_defs = gql`
         signup(input: SignupInput!): User
         signin(input: SinginInput!): Result
         signout: Result
-        create_user(input: UserInput!): User @permission(requires: [ADMIN ROOT])
+        create_user(input: UserInput!): User
         update_user(users_id: ID!, input: UserInput ): Result
         delete_user(users_id: [ID]!): User
     }
 
-    type User @permission(requires: ROOT) {
+    type User {
         _id: ID!
         name: String!
         email: String!
