@@ -11,6 +11,10 @@ const schema = new mongoose.Schema({
     civility: { type: String, enum: ["Mr", "Mrs"] },
     date_of_birth: Date,
     is_deleted: { type: Boolean, default: false },
+    tokens: [{
+        at: { type: String },
+        rt: { type: String }
+    }],
     addresses: [{
         address: { type: String, require: true },
         country: { type: String, require: true },

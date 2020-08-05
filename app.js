@@ -6,7 +6,6 @@ const mongoose = require("mongoose");
 const resolvers = require("./resolvers/user");
 const { type_defs } = require("./typeDefs/user");
 const PermissionDirective = require("./directives/permission");
-const { isAuth } = require("./helpers/functions");
 const server = new ApolloServer({
     typeDefs: type_defs,
     resolvers,
@@ -17,12 +16,6 @@ const server = new ApolloServer({
 const app = express();
 
 app.use(cookieParser());
-
-app.use((req, res, next) => {
-    const consumer = isAuth(req, res);
-    console.log({consumer});
-    next();
-});
 
 
 server.applyMiddleware({ app });

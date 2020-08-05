@@ -1,5 +1,6 @@
-const { UserInputError } = require("apollo-server-express");
+const { UserInputError, AuthenticationError } = require("apollo-server-express");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { User } = require("../models/users");
 const { schema_user, schema_signup, schema_signin } = require("../validations/user");
 const { generate_tokens } = require("../helpers/functions");
@@ -15,6 +16,18 @@ const resolvers = {
         user: async (_, { user_id }) => {
             const user = await User.findOne({ _id: user_id });
             return user;
+        },
+        isAuth: async (_, { rt }) => {
+            if(!rt) throw new AuthenticationError("you are not authenticated");
+            const valid_rt = jwt.verify(rt, process.env.REFRESH_TOKEN_SECRET);
+            if(valid_rt._id) {
+                // I need to get just access token
+                const access_token = await User.findOne({ _id: valid_rt._id }, { tokens: 1 });
+                const at = access_token.tokens.find((value) => value.rt === rt).at;
+                if(at) return { ok: true, message: at };
+                throw new AuthenticationError("you are not authenticated");
+            }
+            throw new AuthenticationError("you are not authenticated");
         }
     },
     Mutation: {
@@ -42,6 +55,7 @@ const resolvers = {
             if(!bcrypt.compareSync(payload.input.password, user.password))
                 return { ok: false, message: "Your password is incorrect"};
             const { rt, at } = generate_tokens(user);
+            await User.updateOne({ _id: user._id }, { $push: { tokens: { rt, at } } });
             res.cookie("rt", rt, { expire: 60 * 5, httpOnly: true });
             res.cookie("at", at, { expire: 60 * 60 * 24 * 30, httpOnly: true });        
             return {
