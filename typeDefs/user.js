@@ -6,7 +6,8 @@ const type_defs = gql`
     type Query {
         users: [user_output!]
         user(user_id: ID!): user_output!
-        isAuth(rt: String!): Output
+        get_access_token(rt: String!): Output
+        isAuth(at: String!): Output
     }
 
     type Mutation {

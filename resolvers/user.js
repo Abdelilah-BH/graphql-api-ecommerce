@@ -17,7 +17,7 @@ const resolvers = {
             const user = await User.findOne({ _id: user_id });
             return user;
         },
-        isAuth: async (_, { rt }) => {
+        get_access_token: async (_, { rt }) => {
             if(!rt) throw new AuthenticationError("you are not authenticated");
             const valid_rt = jwt.verify(rt, process.env.REFRESH_TOKEN_SECRET);
             if(valid_rt._id) {
@@ -28,6 +28,12 @@ const resolvers = {
                 throw new AuthenticationError("you are not authenticated");
             }
             throw new AuthenticationError("you are not authenticated");
+        },
+        isAuth: async (_, { at }) => {
+            if(!at) throw new AuthenticationError("you are not authenticated");
+            const valid_at = jwt.verify(at, process.env.ACCESS_TOKEN_SECRET);
+            if(!valid_at._id) throw new AuthenticationError("you are not authenticated");
+            return { ok: true, message: valid_at._id };
         }
     },
     Mutation: {
