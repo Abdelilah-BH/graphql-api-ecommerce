@@ -62,11 +62,10 @@ const resolvers = {
                 return { ok: false, message: "Your password is incorrect"};
             const { rt, at } = generate_tokens(user);
             await User.updateOne({ _id: user._id }, { $push: { tokens: { rt, at } } });
-            res.cookie("rt", rt, { expire: 60 * 5, httpOnly: true });
-            res.cookie("at", at, { expire: 60 * 60 * 24 * 30, httpOnly: true });        
+            res.cookie("rt", rt, { maxAge: 1000 * 60 * 60 * 24 * 365, httpOnly: true });
             return {
                 ok: true,
-                message: "user has been connected"
+                access_token: at
             };
         },
 

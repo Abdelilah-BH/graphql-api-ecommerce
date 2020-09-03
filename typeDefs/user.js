@@ -4,7 +4,7 @@ const type_defs = gql`
     directive @permissions(requires: [Roles]) on FIELD_DEFINITION
 
     type Query {
-        users: [user_output!]
+        users: [user_output!] @permissions
         user(user_id: ID!): user_output!
         get_access_token(rt: String!): Output
         isAuth(at: String!): Output
@@ -12,11 +12,16 @@ const type_defs = gql`
 
     type Mutation {
         signup(input: register_input!): user_output
-        signin(input: login_input!): Output
+        signin(input: login_input!): output_signin
         signout: Output
         create_user(input: create_user_input!): user_output
         update_user(users_id: ID!, input: update_user_input ): Output
         delete_user(users_id: [ID]!): user_output
+    }
+
+    type output_signin {
+        ok: Boolean!
+        access_token: String!
     }
     
     input create_user_input {

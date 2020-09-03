@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { AuthenticationError } = require("apollo-server-express");
+const { User } = require("../models/users");
 
 const generate_tokens = user => {
     const new_refresh_token = jwt.sign({
@@ -13,40 +14,45 @@ const generate_tokens = user => {
         name: user.name
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "1min" });
+    { expiresIn: "5min" });
     return { at: new_access_token , rt: new_refresh_token };
 };
 
-const checkToken = (access_token, refresh_token) => {
-    let result;
+const isAuth = (req) => {
     try {
-        result = jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET);
-    } catch (err) {
-        try {
-            result = jwt.verify(refresh_token, process.env.REFRESH_TOKEN_SECRET);
-        } catch (err) {
-            throw new AuthenticationError("you are not authenticated");
-        }
+        let access_token = req.headers.authorization;
+        access_token = access_token ? access_token.split(" ")[1] : null;
+        if (!access_token)
+            throw new AuthenticationError("YOU ARE NOT AUTHENTICATED");
+        const result = jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET);
+        req.user = result;
+        return result;    
+    } catch(error) {
+        throw new AuthenticationError("YOU ARE NOT AUTHENTICATED");
     }
-    return result;
 };
 
-const isAuth = (req, res) => {
-    const refresh_token = req.cookies["rt"];
-    const access_token = req.cookies["at"];
-    if (!access_token && !refresh_token)
-        throw new AuthenticationError("you are not authenticated");
-    const consumer = checkToken(access_token, refresh_token);
-    const { rt, at } = generate_tokens(consumer);
-    res.cookie("rt", rt, { expire: 60 * 5, httpOnly: true });
-    res.cookie("at", at, {
-        expire: 60 * 60 * 24 * 30,
-        httpOnly: true,
-    });
-    return consumer;
+const generate_access_token = (refresh_token) => {
+    try {
+        const verify = jwt.verify(refresh_token, process.env.ACCESS_TOKEN_SECRET);
+        const user = User.find({ _id: verify._id });
+        if(!user)
+            return false;
+        const access_token = jwt.sign({
+            _id: user._id,
+            civility: user.civility,
+            name: user.name
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "5min" });
+        return access_token;
+    } catch(error) {
+        return false;
+    }
 };
 
 module.exports = {
     generate_tokens,
     isAuth,
+    generate_access_token
 };
