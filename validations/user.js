@@ -21,8 +21,8 @@ const schema_signup = Joi.object({
 });
 
 const schema_signin = Joi.object({
-    email: Joi.string().email(),
-    password: Joi.string().min(8)
+    email: Joi.string().email().message("Email invalid"),
+    password: Joi.string().min(8).message("8 characters minimum in the password")
 });
 
 module.exports = {

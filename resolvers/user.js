@@ -40,7 +40,7 @@ const resolvers = {
         // not completed
         signup: async (_, payload) => {
             const { error } = schema_signup.validate(payload.input, { abortEarly: false });
-            if(error) throw new UserInputError("Faild to signup");
+            if(error) throw new UserInputError(error.message);
             const user = new User(payload.input);
             await user.save();
             const { at, rt } = generate_tokens(user);
@@ -52,14 +52,14 @@ const resolvers = {
         // not completed
         signin: async (_, payload, { res }) => {
             const { error } = schema_signin.validate(payload.input, { abortEarly: false });
-            if(error)
-                throw new UserInputError("Faild to signin", {
-                    validationErrors: error.details
-                });
+            if(error){
+                console.log({error: error});
+                throw new UserInputError(error.message);
+            }
             const user = await User.findOne({ email: payload.input.email });
-            if(!user) return { ok: false, message: "Your email not exist"};
+            if(!user) throw new AuthenticationError("Your email not exist");
             if(!bcrypt.compareSync(payload.input.password, user.password))
-                return { ok: false, message: "Your password is incorrect"};
+                throw new AuthenticationError("Your password is incorrect");
             const { rt, at } = generate_tokens(user);
             await User.updateOne({ _id: user._id }, { $push: { tokens: { rt, at } } });
             res.cookie("rt", rt, { maxAge: 1000 * 60 * 60 * 24 * 365, httpOnly: true });
